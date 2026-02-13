@@ -67,4 +67,4 @@ app.use("/user", userRoute);
 
 // do not use app.listen() in vercel because vercel will handle the serverless function and it will automatically start the server when a request is made to the endpoint. So we should not start the server manually in vercel.
 
-module.exports = app;  // Export the app for testing purposes
+export default app;  // Export the app for testing purposes
