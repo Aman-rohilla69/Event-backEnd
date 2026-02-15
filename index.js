@@ -5,6 +5,7 @@ import cors from "cors";
 import todoRoute from "./src/Routes/todo.route.js";
 import userRoute from "./src/Routes/user.route.js";
 import cookieParser from "cookie-parser";
+import { id } from "zod/locales";
 const app = express();
 dotenv.config();
 
@@ -23,40 +24,59 @@ app.use(
   }),
 );
 
-// Database connection code
+// let isConnected = false;
 
-// try {
-//   await mongoose.connect(DB_URI);
-//   console.log("Connected to MongoDB");
-// } catch (error) {
-//   console.log(error);
+// async function connectToMongoDB() {
+//   try {
+//     await mongoose.connect(DB_URI, {
+//       // useNewUrlParser: true, // is used to parse the connection string correctly iska matlab hai ki agar connection string me koi special characters hain to unko sahi tarike se handle karega.
+//       // useUnifiedTopology: true, // is used to opt in to the MongoDB driver's new connection management engine. Ye naye engine me connection pooling aur monitoring ke liye better support provide karta hai.
+//     });
+//     isConnected = true;
+//     console.log("Connected to MongoDB");
+//   } catch (error) {
+//     console.error("Error connecting to MongoDB:", error);
+//   }
 // }
 
-// Database verce connection code
+let cached = global.mongoose;
 
-let isConnected = false;
-
-async function connectToMongoDB() {
-  try {
-    await mongoose.connect(DB_URI, {
-      // useNewUrlParser: true, // is used to parse the connection string correctly iska matlab hai ki agar connection string me koi special characters hain to unko sahi tarike se handle karega.
-      // useUnifiedTopology: true, // is used to opt in to the MongoDB driver's new connection management engine. Ye naye engine me connection pooling aur monitoring ke liye better support provide karta hai.
-    });
-    isConnected = true;
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-  }
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
-// middleware to check MongoDB connection before handling requests
-app.use((req, res, next) => {
-  if (!isConnected) {
-    connectToMongoDB();
+async function connectToMongoDB() {
+  if (cached.conn) {
+    return cached.conn;
   }
-  next();
-});
 
+  if (!cached.promise) {
+    cached.promise = mongoose
+      .connect(DB_URI)
+      .then((mongooseInstance) => {
+        console.log("✅ Connected to MongoDB");
+        return mongooseInstance;
+      })
+      .catch((error) => {
+        console.error("❌ MongoDB Error:", error);
+
+        cached.promise = null; // 🔥 MOST IMPORTANT LINE
+        throw error; // 🔥 MOST IMPORTANT LINE
+      });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+// middleware to check MongoDB connection before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectToMongoDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 // routes
 app.use("/todo", todoRoute);
 app.use("/user", userRoute);
@@ -68,3 +88,14 @@ app.use("/user", userRoute);
 // do not use app.listen() in vercel because vercel will handle the serverless function and it will automatically start the server when a request is made to the endpoint. So we should not start the server manually in vercel.
 
 export default app; // Export the app for testing purposes
+
+// Database connection code
+
+// try {
+//   await mongoose.connect(DB_URI);
+//   console.log("Connected to MongoDB");
+// } catch (error) {
+//   console.log(error);
+// }
+
+// Database verce connection code
