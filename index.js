@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL,], // Replace with your frontend URL
+    origin: true,
     credentials: true,
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"], // Add other headers you want to allow here.
@@ -46,13 +46,13 @@ if (!cached) {
 }
 
 async function connectToMongoDB() {
+
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(DB_URI)
+    cached.promise = mongoose.connect(DB_URI)
       .then((mongooseInstance) => {
         console.log("✅ Connected to MongoDB");
         return mongooseInstance;
@@ -60,8 +60,8 @@ async function connectToMongoDB() {
       .catch((error) => {
         console.error("❌ MongoDB Error:", error);
 
-        cached.promise = null; // 🔥 MOST IMPORTANT LINE
-        throw error; // 🔥 MOST IMPORTANT LINE
+        cached.promise = null;   // 🔥 MOST IMPORTANT LINE
+        throw error;             // 🔥 MOST IMPORTANT LINE
       });
   }
 
