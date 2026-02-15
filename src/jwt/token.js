@@ -7,8 +7,8 @@ export const generateTokenAndSaveInCookies = async (userId, res) => {
   });
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
     path: "/",
   });
 
