@@ -46,13 +46,14 @@ app.use(cookieParser());
 // CORS setup
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production"
-      ? process.env.FRONTEND_URL // deployed frontend URL
-      : "http://localhost:5173", // dev frontend URL
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "" // deployed frontend URL
+        : process.env.FRONTEND_URL, // dev frontend URL
     credentials: true,
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 // Check MongoDB connection before each request
@@ -71,12 +72,6 @@ app.use("/todo", todoRoute);
 
 // ---------------- EXPORT APP ----------------
 export default app;
-
-
-
-
-
-
 
 // import express from "express";
 // import mongoose from "mongoose";
