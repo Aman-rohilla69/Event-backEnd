@@ -17,9 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL,
-      "https://event-back-end-eta.vercel.app"
-    ], // Replace with your frontend URL
+    origin: [process.env.FRONTEND_URL,], // Replace with your frontend URL
     credentials: true,
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"], // Add other headers you want to allow here.
