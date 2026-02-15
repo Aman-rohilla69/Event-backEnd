@@ -39,8 +39,8 @@ let isConnected = false;
 async function connectToMongoDB() {
   try {
     await mongoose.connect(DB_URI, {
-      useNewUrlParser: true, // is used to parse the connection string correctly iska matlab hai ki agar connection string me koi special characters hain to unko sahi tarike se handle karega.
-      useUnifiedTopology: true, // is used to opt in to the MongoDB driver's new connection management engine. Ye naye engine me connection pooling aur monitoring ke liye better support provide karta hai.
+      // useNewUrlParser: true, // is used to parse the connection string correctly iska matlab hai ki agar connection string me koi special characters hain to unko sahi tarike se handle karega.
+      // useUnifiedTopology: true, // is used to opt in to the MongoDB driver's new connection management engine. Ye naye engine me connection pooling aur monitoring ke liye better support provide karta hai.
     });
     isConnected = true;
     console.log("Connected to MongoDB");
@@ -67,4 +67,4 @@ app.use("/user", userRoute);
 
 // do not use app.listen() in vercel because vercel will handle the serverless function and it will automatically start the server when a request is made to the endpoint. So we should not start the server manually in vercel.
 
-export default app;  // Export the app for testing purposes
+export default app; // Export the app for testing purposes
